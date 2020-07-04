@@ -1,8 +1,8 @@
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
+import java.util.function.Predicate;
 
 public class RotationalCipher {
     private static final int ALPHABET_LENGTH = 26;
+    private static Predicate<Character> predicate = c -> (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
 
     private final int shiftKey;
 
@@ -11,12 +11,20 @@ public class RotationalCipher {
     }
 
     String rotate(final String data) {
-        return data
+        StringBuilder builder = new StringBuilder();
+
+        data
             .chars()
-            .mapToObj(c -> Pattern.matches("[A-Za-z]", String.valueOf((char)c)) ?
-                String.valueOf(rotateCharacter(this.shiftKey, (char)c)) :
-                String.valueOf((char)c))
-            .collect(Collectors.joining());
+            .forEach(asciiValue -> {
+                char c = (char)asciiValue;
+                if (predicate.test(c)) {
+                    builder.append(rotateCharacter(this.shiftKey, c));
+                } else {
+                    builder.append(c);
+                }
+            });
+
+        return builder.toString();
     }
 
     private static char rotateCharacter(final int shiftKey, final char c) {
